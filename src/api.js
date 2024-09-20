@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { response } from 'express';
 import { authenticate } from './middleware.js';
 import userManager from './user_manager.js';
 
@@ -132,12 +132,54 @@ router.post('/stage3/check', authenticate, (request, response) => {
 });
 
 router.post('/stage4/request', authenticate, (request, response) => {
-    const forwarded = request.headers['X-Forwarded-For'] || request.headers['x-forwarded-for'];
-    
-    if (forwarded != '194.242.26.157') {
-        response.status(200).json({ error: 'You are not in the correct location!' });
+    if (!request.auth) {
+        response.sendStatus(401);
     } else {
-        response.status(200).json({ data: 'Flag: flag{so_no_headers_28013}' });
+        const forwarded = request.headers['X-Forwarded-For'] || request.headers['x-forwarded-for'];
+    
+        if (forwarded != '194.242.26.157') {
+            response.status(200).json({ error: 'You are not in the correct location!' });
+        } else {
+            response.status(200).json({ data: 'Flag: flag{so_no_headers_28013}' });
+        }
+    }
+});
+
+router.get('/stage6/init', authenticate, (request, response) => {
+    if (!request.auth || !userManager.getUser(request.auth.id)) {
+        response.sendStatus(401);
+    } else {
+        const user = userManager.getUser(request.auth.id);
+        if (!user.data.stage6) {
+            userManager.createDatabase(request.auth.id);
+        }
+
+        response.status(200).send('Please don\'t spam this endpoint, it does nothing for the challenge! - Alex');
+    }
+});
+
+router.post('/stage6/create_ticket', authenticate, (request, response) => {
+    if (!request.auth || !userManager.getUser(request.auth.id)) {
+        response.sendStatus(401);
+    } else {
+        if (!request.body.summary || !request.body.description) {
+            response.sendStatus(400);
+        } else {
+            try {
+                userManager.insertTicket(request.auth.id, request.body);
+                response.sendStatus(200);
+            } catch (e) {
+                response.sendStatus(500);
+            }
+        }
+    }
+});
+
+router.get('/stage6/list_tickets', authenticate, (request, response) => {
+    if (!request.auth || !userManager.getUser(request.auth.id)) {
+        response.sendStatus(401);
+    } else {
+        response.status(200).json(userManager.getAllTickets(request.auth.id));
     }
 });
 

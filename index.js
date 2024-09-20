@@ -17,6 +17,9 @@ app.use(cookieParser());
 
 app.use('/api', apiRouter);
 app.use('/stage', stageRouter);
+app.get('/', (request, response) => {
+    response.redirect('/stage/1');
+});
 app.use('/', express.static(path.join(__dirname, '/public')));
 
 app.listen(PORT, () => {

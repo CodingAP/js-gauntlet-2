@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JS Gauntlet 2 - Stage 4</title>
+    <title>JS Gauntlet 2 - Stage 6</title>
     <style>
         * {
             margin: 0;
@@ -66,6 +66,7 @@
             font-weight: bold;
             padding: 20px;
             text-align: center;
+            cursor: pointer;
         }
 
         .footer {
@@ -136,6 +137,76 @@
             justify-content: center;
             align-items: center;
         }
+
+        .modal-body input[type="text"] {
+            width: 75%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 16px;
+        }
+
+        .modal-title {
+            float: left;
+            color: black;
+        }
+
+        .button {
+            border-radius: 999px;
+            box-shadow: #000 0 10px 20px -10px;
+            box-sizing: border-box;
+            color: #FFFFFF;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 24px;
+            font-family: 'Courier New', Courier, monospace;
+            opacity: 1;
+            outline: 0 solid transparent;
+            padding: 8px 18px;
+            margin-bottom: 10px;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+            width: fit-content;
+            word-break: break-word;
+            border: 0;
+        }
+
+        .green-button {
+            background-color: #4CAF50;
+        }
+
+        .red-button {
+            background-color: #f00;
+        }
+
+        .error {
+            color: red;
+        }
+
+        .ticket-container {
+            width: 75%;
+            max-height: 500px;
+            overflow-y: auto;
+            color: #000;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
     </style>
 </head>
 
@@ -156,7 +227,7 @@
             <h2>Dashboard</h2>
             <div class="dashboard-grid">
                 <div class="box" id="create-ticket">Create Ticket</div>
-                <div class="box" id="list-ticket">List Tickets</div>
+                <div class="box" id="list-tickets">List Tickets</div>
                 <div class="box" id="send-notification">Send Notification</div>
                 <div class="box" id="account-settings">Account Settings</div>
             </div>
@@ -168,26 +239,108 @@
 
         <div id="toast" class="toast"></div>
 
-        <div class="modal" id="create-ticket-model">
+        <div class="modal" id="create-ticket-modal">
             <div class="modal-body">
-                <input type="input" placeholder="Ticket Summary...">
-                <input type="input" placeholder="Ticket Description...">
-                <button>Submit</button>
-                <button id="create-ticket-cancel">Cancel</button>
+                <h1 class="modal-title">Create Ticket</h1>
+                <input type="text" id="ticket-summary" placeholder="Ticket Summary...">
+                <input type="text" id="ticket-description" placeholder="Ticket Description...">
+                <p class="error"></p>
+                <button class="button green-button" id="create-ticket-submit">Submit</button>
+                <button class="button red-button" id="create-ticket-cancel">Cancel</button>
+            </div>
+        </div>
+
+        <div class="modal" id="list-tickets-modal">
+            <div class="modal-body">
+                <h1 class="modal-title">List Tickets</h1>
+                <div class="ticket-container">
+                    <table id="ticket-table">
+                        <thead>
+                            <tr>
+                                <th>Ticket ID</th>
+                                <th>Summary</th>
+                                <th>Description</th>
+                                <th>Assigned To</th>
+                                <th>Date (yyyy-mm-dd)</th>
+                                <th>Completed?</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <button class="button red-button" id="list-tickets-cancel">Close</button>
             </div>
         </div>
     </div>
 
     <script defer>
         (() => {
-            const modal = document.querySelector('#create-ticket-model');
+            fetch('/api/stage6/init');
+
+            const createTicketModal = document.querySelector('#create-ticket-modal');
+            const listTicketsModal = document.querySelector('#list-tickets-modal');
+            const tableBody = document.querySelector('#ticket-table tbody');
 
             document.querySelector('#create-ticket').addEventListener('click', () => {
-                modal.classList.add('show');
+                createTicketModal.classList.add('show');
+            });
+
+            document.querySelector('#list-tickets').addEventListener('click', () => {
+                listTicketsModal.classList.add('show');
+                tableBody.innerHTML = 'Loading...';
+                fetch('/api/stage6/list_tickets')
+                    .then(response => response.json())
+                    .then(data => {
+                        tableBody.innerHTML = '';
+                        data.forEach(ticket => {
+                            const row = document.createElement('tr');
+                            
+                            Object.keys(ticket).forEach(key => {
+                                const cell = document.createElement('td');
+                                if (key == 'TICKET_COMPLETE') {
+                                    cell.textContent = (ticket[key] == 1) ? 'Yes' : 'No';    
+                                } else {
+                                    cell.textContent = ticket[key];
+                                }
+                                row.appendChild(cell);
+                            });
+
+                            tableBody.appendChild(row);
+                        });
+                    }).catch(error => {
+                        sendNotification(true, 'Listing tickets failed!');
+                    });
             });
 
             document.querySelector('#create-ticket-cancel').addEventListener('click', () => {
-                modal.classList.remove('show');
+                createTicketModal.classList.remove('show');
+            });
+
+            document.querySelector('#list-tickets-cancel').addEventListener('click', () => {
+                listTicketsModal.classList.remove('show');
+            });
+
+            document.querySelector('#create-ticket-submit').addEventListener('click', () => {
+                const summary = document.querySelector('#ticket-summary').value;
+                const description = document.querySelector('#ticket-description').value;
+
+                if (!summary || !description) {
+                    document.querySelector('.error').innerHTML = 'Please enter summary or description';
+                } else {
+                    document.querySelector('.error').innerHTML = '';
+                    fetch('/api/stage6/create_ticket', {
+                        method: 'post',
+                        headers: {
+                            'content-type': 'application/json'
+                        },
+                        body: JSON.stringify({ summary, description })
+                    }).then(response => {
+                        sendNotification(false, 'Ticket has been created!');
+                    }).catch(error => {
+                        sendNotification(true, 'Ticket creation failed!');
+                    });
+                    createTicketModal.classList.remove('show');
+                }
             });
 
             document.querySelector('#send-notification').addEventListener('click', () => {
@@ -197,22 +350,22 @@
             document.querySelector('#account-settings').addEventListener('click', () => {
                 sendNotification(true, 'Not Available!');
             });
-        })();
 
-        const sendNotification = (isError, content) => {
-            const toast = document.querySelector('#toast');
-            toast.classList.add('show');
-            toast.innerHTML = content;
+            const sendNotification = (isError, content) => {
+                const toast = document.querySelector('#toast');
+                toast.classList.add('show');
+                toast.innerHTML = content;
 
-            toast.classList.remove('error');
-            if (isError) {
-                toast.classList.add('error');
+                toast.classList.remove('error');
+                if (isError) {
+                    toast.classList.add('error');
+                }
+                
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
             }
-            
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
-        }
+        })();
     </script>
 </body>
 
