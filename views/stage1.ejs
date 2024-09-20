@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS Gauntlet 2 - Stage 1</title>
+
+    <script defer>
+        (() => {
+            const observer = new MutationObserver(() => {
+                if (!document.contains(document.querySelector('.hacker-overlay'))) window.location.reload();
+            });
+
+            observer.observe(document, {
+                childList: true,
+                subtree: true
+            });
+        })();
+    </script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        .login-container {
+            width: 600px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .banner {
+            margin-bottom: 20px;
+        }
+
+        .banner img {
+            width: 100%;
+            height: auto;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #333;
+        }
+
+        .login-fields {
+            margin-bottom: 20px;
+        }
+
+        .login-fields input[type="text"],
+        .login-fields input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 16px;
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 18px;
+        }
+
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .social-icons img {
+            margin: 0 10px;
+        }
+
+        .footer p {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #888;
+        }
+
+        .hacker-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(92, 5, 206, 0.5);
+            width: 100%;
+            height: 100%;
+        }
+
+        .hacker-overlay h2 {
+            color: white;
+        }
+
+        .image-overlay {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            
+            width: 80%;
+            height: 50%;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 194.242.26.157: Они думали, что могут обмануть нас дерьмовыми силовыми решениями, поэтому нам пришлось их научить. К счастью, поскольку мы хакеры uber, мы взяли верх. Для других товарищей, пожалуйста, используйте код ключа, предоставленный в Telegram. -->
+    <div class="login-container">
+        <div class="banner">
+            <img src="/img/razorpower_banner.png" alt="Banner">
+        </div>
+
+        <h2>Login</h2>
+        <div class="login-fields">
+            <input type="text" id="username" placeholder="Username">
+            <input type="password" id="password" placeholder="Password">
+        </div>
+
+        <button class="login-button">Login</button>
+
+        <div class="footer">
+            <div class="social-icons">
+                <a href="/img/social_meme.png"><img src="/img/social_icons.png" alt="Facebook"></a>
+            </div>
+            <p>&copy; 2024 RazorPower. All rights reserved.</p>
+        </div>
+    </div>
+
+    <div class="hacker-overlay">
+        <h2>This site has been compromised by the R3n3gad3s</h2>
+        <div class="image-overlay">
+            <img src="/img/renegade.jpg">
+            <img src="/img/renegade.jpg">
+        </div>
+        <h2 id="flag-response">Please stay put for further messages...</h2>
+    </div>
+
+    <script defer>
+        const checksum = 'Vm0wd2QyVkZOVWRpUm1ScFVtMW9WVll3Wkc5V2JGbDNXa1JTV0ZKdGVIbFhhMk0xVmpGYWMySkVUbHBXVmxwUVdWVmFTMk14WkhGUmJVWlhWakpvZVZkV1pEUlpWMDE0V2toT2FGSnRVbGhaYkdSdlpWWmFjMVp0UmxwV01EVjZWMnRvVDJGc1NuTmpSVGxhVmpOb2FGUnRlR3RXTVdSelYyMTBUbUpHY0ZsV2JUQXhWREZzVjFOdVZsSmhlbXhYV1d0YWQxWXhVbGRYYlVaWFlrZFNlbGRyV2s5VWJVcEhZMFp3VjJFeVRYaFdWRVpYVWpGa2NsZHJPVmRpUlhCWVYxY3dNVkV5VmxkalJtaHNVMFUxY2xWdE1UTk5iR3h5VjJ0a1YwMVdjRmhaYm5CSFYwWmFSbUpFVGxWaVJsWXpXbFZhVDJOdFJrZFJiR1JUVmtaYU0xWnFTVEZrYlZGM1QxWmtVMkpIZUZWWmJURTBZMFpTVlZOc1RsVmlSMUo2VjJ0a1IxUnNTbFpYYWxaYVRXcEJNVlJVUmxka1IwcElUbGRvVkZKclZUVlZWbWhMWlZkSmVscEZNV0ZXTVc5M1VWaEtlV0l6WkZOaFYyUnZaRUU5UFdJPWE=';
+        let currentCode = '', currentKeys = [];
+
+        window.addEventListener('keydown', event => {
+            currentCode += event.key;
+            currentKeys.push(event.key);
+            currentCode = btoa(currentCode);
+
+            if (checksum == currentCode) {
+                fetch('/api/check_stage1', {
+                    method: 'post',
+                    headers: {
+                        'content-type': 'application/json'
+                    },
+                    body: JSON.stringify(currentKeys)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.flag != null) {
+                        document.querySelector('#flag-response').innerHTML = `Welcome comrade! ${data.flag}...`;
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, func_48ial-scale=1.0">
+    <title>JS Gauntlet 2 - Stage 5</title>
+
+    <script defer>
+        (() => {
+            const observer = new MutationObserver(() => {
+                if (!document.contains(document.querySelector('.hacker-overlay'))) window.location.reload();
+            });
+
+            observer.observe(document, {
+                childList: true,
+                subtree: true
+            });
+        })();
+    </script>
+
+    <style>
+        .hacker-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            background-color: rgba(92, 5, 206, 0.5);
+            width: 100%;
+            height: 100%;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            max-width: 1000px;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header img {
+            width: 100%;
+            height: auto;
+        }
+
+        .account-info {
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .dashboard {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .dashboard-grid {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .box {
+            flex: 1 1 calc(50% - 20px);
+            color: white;
+            background-color: #4CAF50;
+            font-weight: bold;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .direction-button {
+            background: #5E5DF0;
+            border-radius: 999px;
+            box-shadow: #5E5DF0 0 10px 20px -10px;
+            box-sizing: border-box;
+            color: #FFFFFF;
+            cursor: pointer;
+            font-family: Inter,Helvetica,"Apple Color Emoji","Segoe UI Emoji",NotoColorEmoji,"Noto Color Emoji","Segoe UI Symbol","Android Emoji",EmojiSymbols,-apple-system,system-ui,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans",sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 24px;
+            opacity: 1;
+            outline: 0 solid transparent;
+            padding: 8px 18px;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+            width: fit-content;
+            word-break: break-word;
+            border: 0;
+        }
+
+        .back-button {
+            background: #555;
+        }
+
+        .maze-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="hacker-overlay">
+            <div class="maze-container">
+                <% if (invalid) { %>
+                    <h2>You are in a invalid location! Go back to the beginning!</h2>
+                <% } else { %>
+                    <h2>Where to go next?</h2>
+                    <% if (directions.n) { %>
+                        <button id="north" class="direction-button">North</button>
+                    <% } %>
+                    <% if (directions.s) { %>
+                        <button id="south" class="direction-button">South</button>
+                    <% } %>
+                    <% if (directions.e) { %>
+                        <button id="east" class="direction-button">East</button>
+                    <% } %>
+                    <% if (directions.w) { %>
+                        <button id="west" class="direction-button">West</button>
+                    <% } %>
+                    <% if (directions.S) { %>
+                        <button id="up" class="direction-button">Up</button>
+                    <% } %>
+                    <% if (directions.E) { %>
+                        <button id="down" class="direction-button">Down</button>
+                    <% } %>
+                    <% if (flag.length > 0) { %>
+                        <span><%- flag %></span>
+                    <% } %>
+                <% } %>
+                <br />
+                <button id="beginning" class="direction-button back-button">Back to Beginning</button>
+            </div>
+        </div>
+
+        <header class="header">
+            <img src="/img/razorpower_banner.png" alt="Banner">
+        </header>
+
+        <section class="account-info">
+            <h2>Account Information</h2>
+            <p>Welcome, R3n3gad3s Team</p>
+            <p>Email: uber_h4cker5@gmail.com</p>
+        </section>
+
+        <section class="dashboard">
+            <h2>Dashboard</h2>
+            <div class="dashboard-grid">
+                <div class="box" id="create-ticket">Create Ticket</div>
+                <div class="box" id="list-ticket">List Tickets</div>
+                <div class="box" id="send-notification">Send Notification</div>
+                <div class="box" id="account-settings">Account Settings</div>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <p>&copy; 2024 RazorPower. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script defer>
+        let currentDirections = '';
+        window.addEventListener('load', () => {
+            let tokens = window.location.pathname.split('/');
+            if (tokens[tokens.length - 1] != '5') {
+                currentDirections = tokens[tokens.length - 1];
+            }
+        });
+
+        document.querySelector('#beginning').addEventListener('click', () => {
+            window.location.href = window.location.origin + '/stage/5';
+        });
+
+        <% if (directions.n && !invalid) { %>
+            document.querySelector('#north').addEventListener('click', () => {
+                window.location.href = window.location.origin + '/stage/5/' + currentDirections + 'n';
+            });
+        <% } %>
+        <% if (directions.s && !invalid) { %>
+            document.querySelector('#south').addEventListener('click', () => {
+                window.location.href = window.location.origin + '/stage/5/' + currentDirections + 's';
+            });
+        <% } %>
+        <% if (directions.e && !invalid) { %>
+            document.querySelector('#east').addEventListener('click', () => {
+                window.location.href = window.location.origin + '/stage/5/' + currentDirections + 'e';
+            });
+        <% } %>
+        <% if (directions.w && !invalid) { %>
+            document.querySelector('#west').addEventListener('click', () => {
+                window.location.href = window.location.origin + '/stage/5/' + currentDirections + 'w';
+            });
+        <% } %>
+        <% if (directions.S && !invalid) { %>
+            document.querySelector('#up').addEventListener('click', () => {
+                window.location.href = window.location.origin + '/stage/5/' + currentDirections + 'S';
+            });
+        <% } %>
+        <% if (directions.E && !invalid) { %>
+            document.querySelector('#down').addEventListener('click', () => {
+                window.location.href = window.location.origin + '/stage/5/' + currentDirections + 'E';
+            });
+        <% } %>
+    </script>
+</body>
+
+</html>

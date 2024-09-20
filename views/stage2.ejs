@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS Gauntlet 2 - Stage 2</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        .login-container {
+            width: 600px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .banner {
+            margin-bottom: 20px;
+        }
+
+        .banner img {
+            width: 100%;
+            height: auto;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #333;
+        }
+
+        .login-fields {
+            margin-bottom: 20px;
+        }
+
+        .login-fields input[type="text"],
+        .login-fields input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 16px;
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 18px;
+        }
+
+        .login-button:disabled {
+            background-color: rgb(150, 150, 150);
+            cursor: not-allowed;
+        }
+
+        .login-button:hover {
+            background-color: #45a049;
+        }
+
+        .login-button:disabled:hover {
+            background-color: rgb(150, 150, 150);
+            cursor: not-allowed;
+        }
+
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .social-icons img {
+            margin: 0 10px;
+        }
+
+        .footer p {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #888;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 194.242.26.157: Здравствуйте, мы отключили систему входа в систему, поэтому для других членов команды, пытающихся войти в систему, используйте этот файл cookie в качестве обходного пути. Типичная система входа в систему не будет работать, поэтому не используйте ее. Файл cookie: 'account=eyJhY2NvdW50X25hbWUiOiJyM24zZ2FkM3MiLCJhY2NvdW50X3Bhc3N3b3JkIjoiW1JFREFDVEVEXSJ9' -->
+    <div class="login-container">
+        <div class="banner">
+            <img src="/img/razorpower_banner.png" alt="Banner">
+        </div>
+
+        <% if (loggedIn) { %>
+            <h2>You are currenly logged in!</h2>
+            <h2>flag{clipping_through_the_bars_17493}</h2>
+            <button disabled class="login-button">Login</button>
+        <% } else { %>
+            <h2>Login</h2>
+            <div class="login-fields">
+                <input type="text" id="username" placeholder="Username">
+                <input type="password" id="password" placeholder="Password">
+                <p class="error"></p>
+            </div>
+
+            <button class="login-button">Login</button>
+        <% } %>    
+
+        <div class="footer">
+            <div class="social-icons">
+                <a href="/img/social_meme.png"><img src="/img/social_icons.png" alt="Facebook"></a>
+            </div>
+            <p>&copy; 2024 RazorPower. All rights reserved.</p>
+        </div>
+    </div>
+
+    <script defer>
+        (() => {
+            document.querySelector('.login-button').addEventListener('click', () => {
+                const username = document.querySelector('#username').value;
+                const password = document.querySelector('#password').value; 
+
+                fetch('/api/stage2/login', {
+                    method: 'post',
+                    headers: {
+                        'content-type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        document.querySelector('.error').innerHTML = data.error;
+                    } else {
+                        console.log('LOG: Redirecting is disabled for now...');
+                        console.log(`Flag: ${data.flag}`);
+                    }
+                });
+            });
+        })();
+    </script>
+</body>
+
+</html>
