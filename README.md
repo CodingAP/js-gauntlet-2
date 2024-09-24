@@ -60,12 +60,14 @@ Russian Comment: This seems like a nice system, so I didn't take it down. A bit 
 
 > Okay, now this is starting to get annoying. I have actually seen this puzzle before, but they seem to have made it 100x harder by adding a 5 minute timer! This is impossible, so I am going to call it quits... 
 ~ John from IT
+Russian Comment: I actually took this from a guy called CodingAP. If he didn't want his puzzles being copied, then he wouldn't have put them out so easily...
 
 Flag: `flag{i_actually_wasnt_sorry_83911}`
 
 ### 8. We Will Never Surrender!
 
-> Ok, we got most of stuff back, but to really plant our flag on the hill, we got to fight. Assuming that they are still on our systems, we can use the warning notifications to send some... let's just say "powerful" hits. Of course, we can't do straight up illegal stuff, but if we find their accounts, we can cause some damages. I'm thinking a good amount of spam will take them down.
+> Ok, we got most of stuff back, but if we can get the master key, we can get access to the terminal and finally secure our systems. The problem is the only copy of the master key is on the server that the attackers have access to. After all this, it seems that they have locked it down and we cannot access any file. Please, this is the last thing I ask of you... 
 ~ Justin from IT
 
-Flag: `flag{we_have_surrendered_14765}`
+Flag: `flag{we_have_beaten_them_14765}`
+Russian Comment: It seems like the master key is just placed in the root directory of the server application. I am goign to move that to a safer place, like /dev

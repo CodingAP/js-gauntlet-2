@@ -147,6 +147,7 @@
         let var_80;
         let var_07, var_45;
         let var_62, var_95;
+        let var_03;
         (() => {
             const var_08 = document.querySelector('#pong-container');
             const var_79 = var_08.getContext('2d');
@@ -170,17 +171,12 @@
 
                 var_07 = false;
                 var_45 = false;
+                var_03 = false;
 
                 var_62 = 0;
                 var_95 = 0;
 
-                fetch('/api/stage3/init')
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.message != '') {
-                            document.querySelector('#flag-response').innerHTML = data.message;
-                        }
-                    });
+                fetch('/api/stage3/init');
             }
 
             let var_21, var_25;
@@ -216,6 +212,10 @@
                     var_79.strokeText(Math.ceil(var_35), var_08.width / 2, 25);
                 }
 
+                if (var_03) {
+                    var_79.strokeText('Paused', var_08.width / 2, 60);
+                }
+
                 var_79.shadowBlur = 0;
                 var_79.fillText(var_62, var_08.width / 2 - 50, 25);
                 var_79.fillText(var_95, var_08.width / 2 + 50, 25);
@@ -224,8 +224,12 @@
                     var_79.fillText(Math.ceil(var_35), var_08.width / 2, 25);
                 }
 
-                if (var_35 > 0) {
-                    var_35 -= var_25;
+                if (var_03) {
+                    var_79.fillText('Paused', var_08.width / 2, 60);
+                }
+
+                if (var_35 > 0 || var_03) {
+                    if (!var_03) var_35 -= var_25;
                 } else {
                     var_29 += var_01 * var_25;
                     var_77 += var_75 * var_25;
@@ -315,7 +319,6 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data);
                     if (data.flag != null) {
                         document.querySelector('#flag-response').innerHTML = data.flag;
                     }
@@ -336,12 +339,21 @@
             window.addEventListener('keydown', event => {
                 if (event.key == 'ArrowUp') var_07 = true;
                 if (event.key == 'ArrowDown') var_45 = true;
+                if (event.key == 'Escape') var_03 = !var_03;
             });
 
             window.addEventListener('keyup', event => {
                 if (event.key == 'ArrowUp') var_07 = false;
                 if (event.key == 'ArrowDown') var_45 = false;
             });
+
+            window.addEventListener('blur', () => {
+                var_03 = true;
+            });
+
+            window.addEventListener('focus', () => {
+                var_03 = false;
+            })
         })();
     </script>
 </body>

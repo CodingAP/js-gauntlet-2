@@ -258,8 +258,6 @@ class UserManager {
     nextStage(id) {
         this.users[id].stage++;
         if (this.users[id].stage > 8) this.users[id].stage = 8;
-
-        console.log(this.users);
     }
 
     createDatabase(id) {

@@ -19,7 +19,10 @@ router.get('/1', authenticate, (request, response) => {
 });
 
 router.get('/2', authenticate, isCorrectStage(2), stage2AccountBypass, (request, response) => {
-    response.render('stage2', { loggedIn: (request.auth.stage2Account && request.auth.stage2Account.account_name === 'r3n3gad3s' && request.auth.stage2Account.account_password === 'jobbin_pobbins') });
+    const loggedIn = request.auth.stage2Account && request.auth.stage2Account.account_name === 'r3n3gad3s' && request.auth.stage2Account.account_password === 'jobbin_pobbins';
+    const user = userManager.getUser(request.auth.id);
+    if (loggedIn && user.stage === 2) userManager.nextStage(request.auth.id);
+    response.render('stage2', { loggedIn });
 });
 
 router.get('/3', authenticate, isCorrectStage(3), (request, response) => {
@@ -85,6 +88,8 @@ router.get('/5/:directions', authenticate, isCorrectStage(5), (request, response
         finalDirections[maze[current.z][current.y * 10 + current.x].split('')[i]] = true;
         if (maze[current.z][current.y * 10 + current.x].split('')[i] == 'X') {
             flag = 'flag{this_isnt_a_corn_maze_28131}';
+            const user = userManager.getUser(request.auth.id);
+            if (user.stage === 5) userManager.nextStage(request.auth.id);
         }
     }
 
@@ -95,6 +100,10 @@ router.get('/5/:directions', authenticate, isCorrectStage(5), (request, response
 
 router.get('/6', authenticate, isCorrectStage(6), (request, response) => {
     response.render('stage6');
+});
+
+router.get('/7', authenticate, isCorrectStage(7), (request, response) => {
+    response.render('stage7');
 });
 
 export default router;

@@ -171,7 +171,7 @@
             currentCode = btoa(currentCode);
 
             if (checksum == currentCode) {
-                fetch('/api/check_stage1', {
+                fetch('/api/stage1/check', {
                     method: 'post',
                     headers: {
                         'content-type': 'application/json'

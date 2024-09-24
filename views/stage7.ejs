@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, func_48ial-scale=1.0">
+    <title>JS Gauntlet 2 - Stage 5</title>
+
+    <script defer>
+        (() => {
+            const observer = new MutationObserver(() => {
+                if (!document.contains(document.querySelector('.hacker-overlay'))) window.location.reload();
+            });
+
+            observer.observe(document, {
+                childList: true,
+                subtree: true
+            });
+        })();
+    </script>
+
+    <style>
+        .hacker-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            background-color: rgba(92, 5, 206, 0.5);
+            width: 100%;
+            height: 100%;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            max-width: 1000px;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header img {
+            width: 100%;
+            height: auto;
+        }
+
+        .account-info {
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .dashboard {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .dashboard-grid {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .box {
+            flex: 1 1 calc(50% - 20px);
+            color: white;
+            background-color: #4CAF50;
+            font-weight: bold;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .direction-button {
+            background: #5E5DF0;
+            border-radius: 999px;
+            box-shadow: #5E5DF0 0 10px 20px -10px;
+            box-sizing: border-box;
+            color: #FFFFFF;
+            cursor: pointer;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 24px;
+            opacity: 1;
+            outline: 0 solid transparent;
+            padding: 8px 18px;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+            width: fit-content;
+            word-break: break-word;
+            border: 0;
+            margin-bottom: 10px;
+        }
+
+        .back-button {
+            background: #555;
+        }
+
+        .puzzle-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #555;
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .puzzle-container canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- XXX.XXX.XX.XXX: Привет всем, этот 3D-лабиринт немного сложен для прохождения, поэтому я дал вам решение здесь: nnnnneesene[УДАЛЕНО] -->
+    <div class="container">
+        <div class="hacker-overlay">
+            <div class="puzzle-container">
+                <h2>Move selector with arrow keys, select and swap with space</h2>
+                <canvas width="640" height="400"></canvas>
+                <span id="piece-location">Actual Location: N/A</span>
+                <h2>Timer: 5:00</h2>
+                <span id="flag"></span>
+            </div>
+        </div>
+
+        <header class="header">
+            <img src="/img/razorpower_banner.png" alt="Banner">
+        </header>
+
+        <section class="account-info">
+            <h2>Account Information</h2>
+            <p>Welcome, R3n3gad3s Team</p>
+            <p>Email: uber_h4cker5@gmail.com</p>
+        </section>
+
+        <section class="dashboard">
+            <h2>Dashboard</h2>
+            <div class="dashboard-grid">
+                <div class="box" id="create-ticket">Create Ticket</div>
+                <div class="box" id="list-ticket">List Tickets</div>
+                <div class="box" id="send-notification">Send Notification</div>
+                <div class="box" id="account-settings">Account Settings</div>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <p>&copy; 2024 RazorPower. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script defer>
+        const canvas = document.querySelector('canvas');
+        const context = canvas.getContext('2d');
+
+        (() => {
+            let width = 32;
+            let height = 20;
+            let pieces = [];
+            let hovered = 0;
+            let selected = -1;
+
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    let index = y * width + x;
+                    pieces[index] = { color: `hsl(${Math.floor(index / (width * height) * 360)} 100% 50%)`, location: { x, y } };
+                }
+            }
+
+            let loop = () => {
+                context.fillStyle = '#aaa';
+                context.fillRect(0, 0, canvas.width, canvas.height);
+
+                let tileWidth = canvas.width / width;
+                let tileHeight = canvas.height / height;
+                for (let y = 0; y < height; y++) {
+                    for (let x = 0; x < width; x++) {
+                        let index = y * width + x;
+                        context.fillStyle = pieces[index].color;
+                        context.fillRect(x * tileWidth, y * tileHeight, tileWidth, tileHeight);
+                    }
+                }
+
+                for (let y = 0; y < height; y++) {
+                    for (let x = 0; x < width; x++) {
+                        let index = y * width + x;
+
+                        if (selected == index) {
+                            context.strokeStyle = '#000';
+                            context.lineWidth = 7;
+                            context.strokeRect(x * tileWidth, y * tileHeight, tileWidth, tileHeight);
+                        } else if (hovered == index) {
+                            context.strokeStyle = '#fff';
+                            context.lineWidth = 7;
+                            context.strokeRect(x * tileWidth, y * tileHeight, tileWidth, tileHeight);
+                        }
+                    }
+                }
+
+                document.querySelector('#piece-location').innerHTML = `Actual Location: (${pieces[hovered].location.x}, ${pieces[hovered].location.y})`;
+
+                window.requestAnimationFrame(loop);
+            }
+
+            window.addEventListener('keydown', event => {
+                if (event.key == 'ArrowUp') {
+                    hovered -= width;
+                    if (hovered < 0) hovered += width;
+                }
+
+                if (event.key == 'ArrowDown') {
+                    hovered += width;
+                    if (hovered >= (width * height)) hovered -= width;
+                }
+
+                if (event.key == 'ArrowLeft') {
+                    hovered -= 1;
+                    if (hovered < 0 || hovered % width == width - 1) hovered += 1;
+                }
+
+                if (event.key == 'ArrowRight') {
+                    hovered += 1;
+                    if (hovered >= (width * height) || hovered % width == 0) hovered -= 1;
+                }
+
+                if (event.key == ' ') {
+                    if (selected == -1) selected = hovered;
+                    else {
+                        let temp = JSON.stringify(pieces[selected]);
+                        pieces[selected] = pieces[hovered];
+                        pieces[hovered] = JSON.parse(temp);
+                        selected = -1;
+
+                        let sorted = true;
+                        for (let y = 0; y < height; y++) {
+                            for (let x = 0; x < width; x++) {
+                                let index = y * width + x;
+                                if (!(pieces[index].location.x == x && pieces[index].location.y == y)) {
+                                    sorted = false;
+                                }
+                            }
+                        }
+
+                        if (sorted) {
+                            fetch('/api/stage4-flag').then(response => response.text()).then(text => {
+                                document.querySelector('#flag').innerHTML = text;
+                            });
+                        }
+                    }
+                }
+            });
+
+            loop();
+        })();
+    </script>
+</body>
+
+</html>

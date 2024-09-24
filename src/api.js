@@ -44,10 +44,8 @@ router.get('/stage3/init', authenticate, (request, response) => {
     } else {
         const user = userManager.getUser(request.auth.id);
         if (user.data.stage3) {
-            user.data.stage3.inTimeout = true;
             user.data.stage3.lastPlayerScore = 0;
             user.data.stage3.lastCpuScore = 0;
-            response.status(200).json({ message: 'Don\'t touch the endpoint! 5 minute timeout for you!' });
         } else {
             user.data.stage3 = {
                 lastPlayerScore: 0,
@@ -55,8 +53,8 @@ router.get('/stage3/init', authenticate, (request, response) => {
                 lastTime: new Date().getTime(),
                 inTimeout: false
             };
-            response.status(200).json({ message: '' });
         }
+        response.sendStatus(200);
     }
 });
 
@@ -108,7 +106,7 @@ router.post('/stage3/check', authenticate, (request, response) => {
                         flag = 'I don\'t like score-changing cheaters! 5 minute timeout for you!';
                     }
 
-                    if (playerScore - user.data.stage3.lastPlayerScore === 1 && Math.abs(totalWidth - ballXPosition) >= 5) {
+                    if (playerScore - user.data.stage3.lastPlayerScore === 1 && Math.abs(totalWidth - ballXPosition) >= 30) {
                         user.data.stage3.inTimeout = true;
                         user.data.stage3.lastPlayerScore = 0;
                         user.data.stage3.lastCpuScore = 0;
@@ -121,6 +119,7 @@ router.post('/stage3/check', authenticate, (request, response) => {
 
                         if (playerScore >= 5) {
                             flag = 'flag{hey_stop_looking_there_23912}';
+                            if (user.stage === 3) userManager.nextStage(request.auth.id);
                         }
                     }
                     
@@ -132,7 +131,7 @@ router.post('/stage3/check', authenticate, (request, response) => {
 });
 
 router.post('/stage4/request', authenticate, (request, response) => {
-    if (!request.auth) {
+    if (!request.auth || !userManager.getUser(request.auth.id)) {
         response.sendStatus(401);
     } else {
         const forwarded = request.headers['X-Forwarded-For'] || request.headers['x-forwarded-for'];
@@ -140,7 +139,10 @@ router.post('/stage4/request', authenticate, (request, response) => {
         if (forwarded != '194.242.26.157') {
             response.status(200).json({ error: 'You are not in the correct location!' });
         } else {
-            response.status(200).json({ data: 'Flag: flag{so_no_headers_28013}' });
+            response.status(200).json({ flag: 'Flag: flag{so_no_headers_28013}' });
+
+            const user = userManager.getUser(request.auth.id);
+            if (user.stage === 4) userManager.nextStage(request.auth.id);
         }
     }
 });
@@ -167,9 +169,10 @@ router.post('/stage6/create_ticket', authenticate, (request, response) => {
         } else {
             try {
                 userManager.insertTicket(request.auth.id, request.body);
-                console.log(userManager.getModifiedTicket(request.auth.id));
                 if (userManager.getModifiedTicket(request.auth.id)['TICKET_COMPLETE'] == 1) {
                     userManager.insertTicket(request.auth.id, { summary: 'The Flag', description: 'flag{legit_number_one_19373}' });
+                    const user = userManager.getUser(request.auth.id);
+                    if (user.stage === 6) userManager.nextStage(request.auth.id);
                 }
                 response.sendStatus(200);
             } catch (e) {
