@@ -167,6 +167,7 @@ router.post('/stage6/create_ticket', authenticate, (request, response) => {
         } else {
             try {
                 userManager.insertTicket(request.auth.id, request.body);
+                console.log(userManager.getModifiedTicket(request.auth.id));
                 response.sendStatus(200);
             } catch (e) {
                 response.sendStatus(500);

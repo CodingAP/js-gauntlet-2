@@ -287,7 +287,7 @@ class UserManager {
 
         db.close();
 
-        this.getUser(id).data.stage6 = true;
+        this.getUser(id).data.stage6 = randomEntry;
     }
 
     insertTicket(id, data) {
@@ -311,6 +311,18 @@ class UserManager {
         db.close();
 
         return tickets;
+    }
+
+    getModifiedTicket(id) {
+        const db = new Database(`data/${id}.db`);
+        db.pragma('journal_mode = WAL');
+
+        const getStatement = db.prepare('SELECT * FROM TICKETS WHERE TICKET_ID = ?');
+        const ticket = getStatement.run(this.getUser(id).data.stage6).first();
+
+        db.close();
+
+        return ticket;
     }
 }
 
