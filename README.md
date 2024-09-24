@@ -14,6 +14,7 @@ The flags will take the structure of `flag{FLAG_HERE_XXXXX}`.
 ~ Sven from IT 
 
 Flag: `flag{30_lives_for_you_38201}`
+Russian Comment: They thought they could fool us with shitty power solutions, so we had to teach them. Fortunately, since we are uber hackers, we took over. For other comrades, please use the key code provided on Telegram.
 
 ### 2. How Did You Get In Here?
 
@@ -21,6 +22,7 @@ Flag: `flag{30_lives_for_you_38201}`
 ~ Justin from IT
 
 Flag: `flag{clipping_through_the_bars_17493}`
+Russian Comment: Hello, we have disabled the login system, so for other team members trying to log in, please use this cookie as a workaround. The typical login system won't work, so don't use it. Cookie: 'account=eyJhY2NvdW50X25hbWUiOiJyM24zZ2FkM3MiLCJhY2NvdW50X3Bhc3N3b3JkIjoiW1JFREFDVEVEXSJ9'
 
 ### 3. Irresistible Force
 
@@ -28,6 +30,7 @@ Flag: `flag{clipping_through_the_bars_17493}`
 ~ John from IT
 
 Flag: `flag{hey_stop_looking_there_23912}`
+Russian Comment: It was fun to do, but now it's time to get serious. We're not going to let those bastards get by, so I've made sure to add anti-cheat technology. I'm sure there are no cracks in the system, so use the method described in Telegram to use the system if necessary.
 
 ### 4. Teleportation
 
@@ -35,6 +38,7 @@ Flag: `flag{hey_stop_looking_there_23912}`
 ~ Stanley from IT
 
 Flag: `flag{so_no_headers_28013}`
+Russian Comment: I decided to hide my IP address now because apparently previous posts were leaked to the site. I don't know how it happened, but I hope it doesn't lead to problems in the future.
 
 ### 5. We Are Doing This Again? 
 
@@ -42,6 +46,7 @@ Flag: `flag{so_no_headers_28013}`
 ~ Sven from IT
 
 Flag: `flag{this_isnt_a_corn_maze_28131}`
+Russian Comment: Hello all, this 3D maze is a bit of a bitch to traverse, so I have given the solution to you here: nnnnneesene[REDACTED]
 
 ### 6. Best In Class
 
@@ -49,6 +54,7 @@ Flag: `flag{this_isnt_a_corn_maze_28131}`
 ~ Stanley from IT
 
 Flag: `flag{legit_number_one_19373}`
+Russian Comment: This seems like a nice system, so I didn't take it down. A bit primitive, but I like its simplicity. I could go ahead and modify everything that is here for the hell of it, but I think that is not necessary.
 
 ### 7. We're Definitely Doing This Again...
 

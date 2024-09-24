@@ -168,6 +168,9 @@ router.post('/stage6/create_ticket', authenticate, (request, response) => {
             try {
                 userManager.insertTicket(request.auth.id, request.body);
                 console.log(userManager.getModifiedTicket(request.auth.id));
+                if (userManager.getModifiedTicket(request.auth.id)['TICKET_COMPLETE'] == 1) {
+                    userManager.insertTicket(request.auth.id, { summary: 'The Flag', description: 'flag{legit_number_one_19373}' });
+                }
                 response.sendStatus(200);
             } catch (e) {
                 response.sendStatus(500);

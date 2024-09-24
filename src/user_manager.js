@@ -316,9 +316,8 @@ class UserManager {
     getModifiedTicket(id) {
         const db = new Database(`data/${id}.db`);
         db.pragma('journal_mode = WAL');
-
-        const getStatement = db.prepare('SELECT * FROM TICKETS WHERE TICKET_ID = ?');
-        const ticket = getStatement.run(this.getUser(id).data.stage6).first();
+        
+        const ticket = db.prepare('SELECT * FROM TICKETS WHERE TICKET_ID = ?').get(this.getUser(id).data.stage6 + 1);
 
         db.close();
 
