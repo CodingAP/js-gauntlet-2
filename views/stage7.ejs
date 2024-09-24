@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, func_48ial-scale=1.0">
-    <title>JS Gauntlet 2 - Stage 5</title>
+    <title>JS Gauntlet 2 - Stage 7</title>
 
     <script defer>
         (() => {
@@ -154,7 +154,7 @@
                 <h2>Move selector with arrow keys, select and swap with space</h2>
                 <canvas width="640" height="400"></canvas>
                 <span id="piece-location">Actual Location: N/A</span>
-                <h2>Timer: 5:00</h2>
+                <h2 id="timer">Timer: 5:00</h2>
                 <span id="flag"></span>
             </div>
         </div>
@@ -189,20 +189,117 @@
         const context = canvas.getContext('2d');
 
         (() => {
-            let width = 32;
-            let height = 20;
-            let pieces = [];
-            let hovered = 0;
-            let selected = -1;
+            fetch('/api/stage7/init')
+            .then(response => response.json())
+            .then(data => {
+                init(data.seed);
+            });
 
-            for (let y = 0; y < height; y++) {
-                for (let x = 0; x < width; x++) {
-                    let index = y * width + x;
-                    pieces[index] = { color: `hsl(${Math.floor(index / (width * height) * 360)} 100% 50%)`, location: { x, y } };
+            let width, height, pieces, hovered, selected, timer, moves;
+
+            const init = (seed) => {
+                let state = seed;
+                const randomFloat = () => {
+                    state = (1103515245 * state + 12345) % Math.pow(2, 31);
+                    return state / Math.pow(2, 31);
                 }
-            }
 
-            let loop = () => {
+                width = 32;
+                height = 20;
+                pieces = [];
+                hovered = 0;
+                selected = -1;
+                timer = 5 * 60;
+                moves = [];
+                
+
+                for (let y = 0; y < height; y++) {
+                    for (let x = 0; x < width; x++) {
+                        let index = y * width + x;
+                        pieces[index] = { color: `hsl(${Math.floor(index / (width * height) * 360)} 100% 50%)`, location: { x, y } };
+                    }
+                }
+
+                pieces.sort((a, b) => randomFloat() < 0.66);
+                pieces.sort((a, b) => randomFloat() < 0.66);
+                pieces.sort((a, b) => randomFloat() < 0.66);
+
+                window.addEventListener('keydown', event => {
+                    if (event.key == 'ArrowUp') {
+                        hovered -= width;
+                        if (hovered < 0) hovered += width;
+                    }
+
+                    if (event.key == 'ArrowDown') {
+                        hovered += width;
+                        if (hovered >= (width * height)) hovered -= width;
+                    }
+
+                    if (event.key == 'ArrowLeft') {
+                        hovered -= 1;
+                        if (hovered < 0 || hovered % width == width - 1) hovered += 1;
+                    }
+
+                    if (event.key == 'ArrowRight') {
+                        hovered += 1;
+                        if (hovered >= (width * height) || hovered % width == 0) hovered -= 1;
+                    }
+
+                    if (event.key == ' ') {
+                        if (selected == -1) selected = hovered;
+                        else {
+                            moves.push({ from: selected, to: hovered });
+
+                            let temp = JSON.stringify(pieces[selected]);
+                            pieces[selected] = pieces[hovered];
+                            pieces[hovered] = JSON.parse(temp);
+                            selected = -1;
+
+                            let sorted = true;
+                            for (let y = 0; y < height; y++) {
+                                for (let x = 0; x < width; x++) {
+                                    let index = y * width + x;
+                                    if (!(pieces[index].location.x == x && pieces[index].location.y == y)) {
+                                        sorted = false;
+                                    }
+                                }
+                            }
+
+                            if (sorted) {
+                                fetch('/api/stage7/check', {
+                                    method: 'post',
+                                    headers: {
+                                        'content-type': 'application/json'
+                                    },
+                                    body: JSON.stringify(moves)
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.flag) {
+                                        document.querySelector('#flag').innerHTML = data.flag;
+                                    }
+                                });
+                            }
+                        }
+                    }
+                });
+
+                let timerInterval = setInterval(() => {
+                    timer--;
+                    const minute = Math.floor(timer / 60);
+                    const second = timer % 60;
+                    document.querySelector('#timer').innerHTML = `Timer: ${minute}:${second.toString().padStart(2, '0')}`;
+
+                    if (timer == 0) {
+                        document.querySelector('#timer').innerHTML = 'Time is up!';
+                        clearInterval(timerInterval);
+                    }
+                }, 1000);
+
+                loop();
+            }
+            
+            const loop = () => {
                 context.fillStyle = '#aaa';
                 context.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -236,56 +333,6 @@
 
                 window.requestAnimationFrame(loop);
             }
-
-            window.addEventListener('keydown', event => {
-                if (event.key == 'ArrowUp') {
-                    hovered -= width;
-                    if (hovered < 0) hovered += width;
-                }
-
-                if (event.key == 'ArrowDown') {
-                    hovered += width;
-                    if (hovered >= (width * height)) hovered -= width;
-                }
-
-                if (event.key == 'ArrowLeft') {
-                    hovered -= 1;
-                    if (hovered < 0 || hovered % width == width - 1) hovered += 1;
-                }
-
-                if (event.key == 'ArrowRight') {
-                    hovered += 1;
-                    if (hovered >= (width * height) || hovered % width == 0) hovered -= 1;
-                }
-
-                if (event.key == ' ') {
-                    if (selected == -1) selected = hovered;
-                    else {
-                        let temp = JSON.stringify(pieces[selected]);
-                        pieces[selected] = pieces[hovered];
-                        pieces[hovered] = JSON.parse(temp);
-                        selected = -1;
-
-                        let sorted = true;
-                        for (let y = 0; y < height; y++) {
-                            for (let x = 0; x < width; x++) {
-                                let index = y * width + x;
-                                if (!(pieces[index].location.x == x && pieces[index].location.y == y)) {
-                                    sorted = false;
-                                }
-                            }
-                        }
-
-                        if (sorted) {
-                            fetch('/api/stage4-flag').then(response => response.text()).then(text => {
-                                document.querySelector('#flag').innerHTML = text;
-                            });
-                        }
-                    }
-                }
-            });
-
-            loop();
         })();
     </script>
 </body>

@@ -190,4 +190,62 @@ router.get('/stage6/list_tickets', authenticate, (request, response) => {
     }
 });
 
+router.get('/stage7/init', authenticate, (request, response) => {
+    if (!request.auth || !userManager.getUser(request.auth.id)) {
+        response.sendStatus(401);
+    } else {
+        const user = userManager.getUser(request.auth.id);
+        let seed = Math.floor(Math.random() * Math.pow(2, 31));
+        if (!user.data.stage7) {
+            user.data.stage7 = { seed };
+        } else {
+            seed = user.data.stage7.seed;
+        }
+        user.data.stage7.started = new Date().getTime();
+        
+        response.status(200).json({ seed });
+    }
+});
+
+router.post('/stage7/check', authenticate, (request, response) => {
+    if (!request.auth || !userManager.getUser(request.auth.id)) {
+        response.sendStatus(401);
+    } else if (!request.body || !Array.isArray(request.body) || request.body.length === 0) {
+        response.status(200).json({ flag: 'I don\'t like cheaters! Do it right!' });
+    } else {
+        const user = userManager.getUser(request.auth.id);
+        if (!user.data.stage7) {
+            response.sendStatus(401);
+        } else {
+            simulatePuzzle(user.data.stage7.seed);
+            response.sendStatus(200);
+        }
+    }
+});
+
+const simulatePuzzle = seed => {
+    let state = seed;
+    const randomFloat = () => {
+        state = (1103515245 * state + 12345) % Math.pow(2, 31);
+        return state / Math.pow(2, 31);
+    }
+
+    const width = 32;
+    const height = 20;
+    let pieces = [];
+    
+    for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+            let index = y * width + x;
+            pieces[index] = { x, y };
+        }
+    }
+
+    pieces.sort((a, b) => randomFloat() < 0.66);
+    pieces.sort((a, b) => randomFloat() < 0.66);
+    pieces.sort((a, b) => randomFloat() < 0.66);
+
+    console.log(pieces);
+}
+
 export default router;
