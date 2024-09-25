@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS Gauntlet 2 - Stage 8</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            max-width: 1000px;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header img {
+            width: 100%;
+            height: auto;
+        }
+
+        .account-info {
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .dashboard {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .dashboard-grid {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .box {
+            flex: 1 1 calc(50% - 20px);
+            color: white;
+            background-color: #4CAF50;
+            font-weight: bold;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .toast {
+            visibility: hidden;
+            min-width: 200px;
+            color: black;
+            background-color: lightgreen;
+            text-align: center;
+            border: 3px solid green;
+            border-radius: 4px;
+            padding: 16px;
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            z-index: 1;
+            opacity: 0;
+            transition: opacity 0.5s, visibility 0.5s;
+        }
+
+        .toast.error {
+            background-color: lightcoral;
+            border-color: red;
+        }
+
+        .toast.show {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .modal {
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.5);
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.5s, visibility 0.5s;
+            pointer-events: none;
+        }
+
+        .modal.show {
+            visibility: visible;
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-body {
+            width: 50%;
+            height: 50%;
+            color: black;
+            background-color: white;
+            border-radius: 10px;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-body input[type="text"] {
+            width: 75%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 16px;
+        }
+
+        .modal-title {
+            float: left;
+            color: black;
+        }
+
+        .button {
+            border-radius: 999px;
+            box-shadow: #000 0 10px 20px -10px;
+            box-sizing: border-box;
+            color: #FFFFFF;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 24px;
+            font-family: 'Courier New', Courier, monospace;
+            opacity: 1;
+            outline: 0 solid transparent;
+            padding: 8px 18px;
+            margin-bottom: 10px;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+            width: fit-content;
+            word-break: break-word;
+            border: 0;
+        }
+
+        .green-button {
+            background-color: #4CAF50;
+        }
+
+        .red-button {
+            background-color: #f00;
+        }
+
+        .error {
+            color: red;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- XXX.XXX.XX.XXX: Создается впечатление, что мастер-ключ просто помещается в корневой каталог серверного приложения. Я собираюсь переместить это в более безопасное место, например, /etc -->
+    <div class="container">
+        <header class="header">
+            <img src="/img/razorpower_banner.png" alt="Banner">
+        </header>
+
+        <section class="account-info">
+            <h2>Account Information</h2>
+            <p>Welcome, R3n3gad3s Team</p>
+            <p>Email: uber_h4cker5@gmail.com</p>
+        </section>
+
+        <section class="dashboard">
+            <h2>Dashboard</h2>
+            <div class="dashboard-grid">
+                <div class="box" id="create-ticket">Create Ticket</div>
+                <div class="box" id="list-tickets">List Tickets</div>
+                <div class="box" id="send-notification">Send Notification</div>
+                <div class="box" id="account-settings">Account Settings</div>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <p>&copy; 2024 RazorPower. All rights reserved.</p>
+        </footer>
+
+        <div id="toast" class="toast"></div>
+
+        <div class="modal" id="send-notification-modal">
+            <div class="modal-body">
+                <h1 class="modal-title">Send Notification</h1>
+                <input type="text" id="notification-message" placeholder="Notification Message...">
+                <p id="error-message" class="error"></p>
+                <p class="error">Warning: This will be sent to all users and will be logged! If you want to see past notifications, go to Account Settings...</p>
+                <button class="button green-button" id="notification-submit">Submit</button>
+                <button class="button red-button" id="notification-cancel">Cancel</button>
+            </div>
+        </div>
+
+        <div class="modal" id="account-settings-modal">
+            <div class="modal-body">
+                <h1 class="modal-title">Account Settings</h1>
+                <h2>Username: R3n3gad3s Team</h2>
+                <h2>Email: uber_h4cker5@gmail.com</h2>
+                <h2 id="account-password">Password: ********</h2>
+                <button class="button green-button" id="show-password">Show Password</button>
+
+                <h2>Select notification to view:</h2>
+                <select id="file-select"></select>
+                <p id="error-message" class="error"></p>
+                <div>
+                    <button class="button green-button" id="open-notification">Open Notification</button>
+                    <button class="button red-button" id="account-settings-cancel">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal" id="open-notification-modal">
+            <div class="modal-body">
+                <h1 class="modal-title">Notification</h1>
+                <div id="content"></div>
+                <button class="button red-button" id="clear-content">Back</button>
+            </div>
+        </div>
+    </div>
+
+    <script defer>
+        (() => {
+            const sendNotificationModal = document.querySelector('#send-notification-modal');
+            const accountSettingsModal = document.querySelector('#account-settings-modal');
+            const openNotificationModal = document.querySelector('#open-notification-modal');
+            const fileSelect = document.querySelector('#file-select');
+
+            document.querySelector('#create-ticket').addEventListener('click', () => {
+                sendNotification(true, 'Not Available!');
+            });
+
+            document.querySelector('#list-tickets').addEventListener('click', () => {
+                sendNotification(true, 'Not Available!');
+            });
+
+            document.querySelector('#send-notification').addEventListener('click', () => {
+                sendNotificationModal.classList.add('show');
+            });
+
+            document.querySelector('#account-settings').addEventListener('click', () => {
+                accountSettingsModal.classList.add('show');
+                fetch('/api/stage8/get_all_notifications')
+                .then(response => response.json())
+                .then(data => {
+                    fileSelect.innerHTML = '';
+                    for (let i = 0; i < data.length; i++) {
+                        const option = document.createElement('option');
+                        option.value = data[i];
+                        option.innerHTML = data[i];
+                        fileSelect.appendChild(option);
+                    }
+                })
+            });
+
+            document.querySelector('#notification-cancel').addEventListener('click', () => {
+                sendNotificationModal.classList.remove('show');
+            });
+
+            document.querySelector('#notification-submit').addEventListener('click', () => {
+                const message = document.querySelector('#notification-message').value;
+
+                if (!message) {
+                    document.querySelector('#error-message').innerHTML = 'Please enter a message';
+                } else {
+                    document.querySelector('#error-message').innerHTML = '';
+                    fetch('/api/stage8/send_notification', {
+                        method: 'post',
+                        headers: {
+                            'content-type': 'application/json'
+                        },
+                        body: JSON.stringify({ message })
+                    }).then(response => {
+                        sendNotification(false, 'Notification has been sent!');
+                    }).catch(error => {
+                        sendNotification(true, 'Notification failed to send!');
+                    });
+                    sendNotificationModal.classList.remove('show');
+                }
+            });
+
+            document.querySelector('#show-password').addEventListener('click', () => {
+                document.querySelector('#account-password').innerHTML = 'Password: ohyouabsoluteparagonofmisguidedbrillianceashiningbeaconofstrategicineptitudetrulythemichelangeloofpoordecisionmakingdiditnotonceoccurtoyouintheinfiniteabyssofyourquestionablejudgmentthatrevealingthepasswordtoafictionalaccountinactfanactsofdevoidofpurposethatitbordersonexistentialabsurditywouldachievenothingbutdemonstratetotheworldyourunparalleledabilitytomisstheentirepointofthechallengeareyoutryingtorewritetherulesofcommonsenseonepoorchoiceatatimeoristhisjustanelaborateperformanceartpieceshowcasingtherarecombinationofaudacityandignoranceinperfecttragicharmonysurelyyoumustbetrollingusallbecausenoonenotevenyoucouldseriouslybelievethatexposingapasswordanartifactmeanttobeuncoveredthroughwitskillandcunningwoulddoanythingbuthighlightyourcompleteandutterdisconnectionfromtheveryessenceofwhatactfismeanttochallengecongratulationsyouvenotonlyfailedthechallengebuthavealsosuccessfullyascendedtonewheightsoffutilitythatwedidntevenknowexistedbravo';
+            });
+
+            document.querySelector('#account-settings-cancel').addEventListener('click', () => {
+                accountSettingsModal.classList.remove('show');
+            });
+
+            document.querySelector('#open-notification').addEventListener('click', () => {
+                accountSettingsModal.classList.remove('show');
+
+                fetch('/api/stage8/show_notification', {
+                    method: 'post',
+                    headers: {
+                        'content-type': 'application/json'
+                    },
+                    body: JSON.stringify({ file: 'logs/' + fileSelect.value })
+                }).then(response => response.json())
+                .then(data => {
+                    document.querySelector('#content').innerHTML = data.data.data.map(byte => String.fromCharCode(byte)).join('');
+                    openNotificationModal.classList.add('show');
+                })
+            });
+
+            document.querySelector('#clear-content').addEventListener('click', () => {
+                openNotificationModal.classList.remove('show');
+                accountSettingsModal.classList.add('show');
+            });
+
+            const sendNotification = (isError, content) => {
+                const toast = document.querySelector('#toast');
+                toast.classList.add('show');
+                toast.innerHTML = content;
+
+                toast.classList.remove('error');
+                if (isError) {
+                    toast.classList.add('error');
+                }
+                
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
+            }
+        })();
+    </script>
+</body>
+
+</html>

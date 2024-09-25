@@ -147,7 +147,7 @@
 </head>
 
 <body>
-    <!-- XXX.XXX.XX.XXX: Привет всем, этот 3D-лабиринт немного сложен для прохождения, поэтому я дал вам решение здесь: nnnnneesene[УДАЛЕНО] -->
+    <!-- XXX.XXX.XX.XXX: На самом деле я получил это от парня по имени CodingAP. Если бы он не хотел, чтобы его головоломки копировали, то он бы не выпустил их так легко... -->
     <div class="container">
         <div class="hacker-overlay">
             <div class="puzzle-container">
@@ -192,37 +192,27 @@
             fetch('/api/stage7/init')
             .then(response => response.json())
             .then(data => {
-                init(data.seed);
+                init(data.pieces);
             });
 
             let width, height, pieces, hovered, selected, timer, moves;
 
-            const init = (seed) => {
-                let state = seed;
-                const randomFloat = () => {
-                    state = (1103515245 * state + 12345) % Math.pow(2, 31);
-                    return state / Math.pow(2, 31);
-                }
-
+            const init = (p) => {
                 width = 32;
                 height = 20;
-                pieces = [];
                 hovered = 0;
                 selected = -1;
                 timer = 5 * 60;
                 moves = [];
-                
+                pieces = [];
 
                 for (let y = 0; y < height; y++) {
                     for (let x = 0; x < width; x++) {
                         let index = y * width + x;
-                        pieces[index] = { color: `hsl(${Math.floor(index / (width * height) * 360)} 100% 50%)`, location: { x, y } };
+                        let position = p[index];
+                        pieces[index] = { color: `hsl(${Math.floor((position.y * width + position.x) / (width * height) * 360)} 100% 50%)`, location: position };
                     }
                 }
-
-                pieces.sort((a, b) => randomFloat() < 0.66);
-                pieces.sort((a, b) => randomFloat() < 0.66);
-                pieces.sort((a, b) => randomFloat() < 0.66);
 
                 window.addEventListener('keydown', event => {
                     if (event.key == 'ArrowUp') {

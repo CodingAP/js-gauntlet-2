@@ -106,4 +106,8 @@ router.get('/7', authenticate, isCorrectStage(7), (request, response) => {
     response.render('stage7');
 });
 
+router.get('/8', authenticate, isCorrectStage(8), (request, response) => {
+    response.render('stage8');
+});
+
 export default router;

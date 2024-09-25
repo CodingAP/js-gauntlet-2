@@ -1,6 +1,10 @@
-import express, { response } from 'express';
+import fs from 'fs';
+import express from 'express';
 import { authenticate } from './middleware.js';
 import userManager from './user_manager.js';
+
+// _have_bea
+// aW5kZXguanM=
 
 const router = express.Router();
 
@@ -203,7 +207,8 @@ router.get('/stage7/init', authenticate, (request, response) => {
         }
         user.data.stage7.started = new Date().getTime();
         
-        response.status(200).json({ seed });
+        const pieces = simulatePuzzle(user.data.stage7.seed);
+        response.status(200).json({ pieces });
     }
 });
 
@@ -217,13 +222,63 @@ router.post('/stage7/check', authenticate, (request, response) => {
         if (!user.data.stage7) {
             response.sendStatus(401);
         } else {
-            simulatePuzzle(user.data.stage7.seed);
-            response.sendStatus(200);
+            try {
+                let passedTime = new Date().getTime() - user.data.stage7.started;
+                if (passedTime > 5 * 60 * 1000) {
+                    response.status(200).json({ flag: 'Sorry, time is up!' });
+                } else if (checkPuzzle(user.data.stage7.seed, request.body)) {
+                    response.status(200).json({ flag: 'flag{i_actually_wasnt_sorry_83911}' });
+                    if (user.stage === 7) userManager.nextStage(request.auth.id);
+                } else {
+                    response.status(200).json({ flag: 'I don\'t like cheaters! Do it right!' });
+                }
+            } catch (e) {
+                response.sendStatus(500);
+            }
         }
     }
 });
 
-const simulatePuzzle = seed => {
+router.post('/stage8/send_notification', authenticate, (request, response) => {
+    if (!request.auth) {
+        response.sendStatus(401);
+    } else {
+        if (!request.body.message) {
+            response.sendStatus(400);
+        } else {
+            let alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            const random = new Array(10).fill(0).map(_ => alphabet[Math.floor(Math.random() * alphabet.length)]).join('');
+            fs.writeFile('logs/' + random + '.log', request.body.message + ' - From R3n3gad3s', (error) => {
+                if (error) response.sendStatus(500);
+                else response.sendStatus(200);
+            });
+        }
+    }
+});
+
+router.get('/stage8/get_all_notifications', authenticate, (request, response) => {
+    if (!request.auth) {
+        response.sendStatus(401);
+    } else {
+        fs.readdir('logs', (error, files) => {
+            if (error) response.sendStatus(500);
+            response.status(200).json(files);
+        });
+    }
+});
+
+router.post('/stage8/show_notification', authenticate, (request, response) => {
+    if (!request.auth) {
+        response.sendStatus(401);
+    } else {
+        fs.readFile(request.body.file, (error, data) => {
+            if (error) response.sendStatus(500);
+            else response.status(200).json({ data });
+        });
+    }
+});
+
+const simulatePuzzle = (seed) => {
     let state = seed;
     const randomFloat = () => {
         state = (1103515245 * state + 12345) % Math.pow(2, 31);
@@ -241,11 +296,38 @@ const simulatePuzzle = seed => {
         }
     }
 
-    pieces.sort((a, b) => randomFloat() < 0.66);
-    pieces.sort((a, b) => randomFloat() < 0.66);
-    pieces.sort((a, b) => randomFloat() < 0.66);
+    for (let i = 0; i < pieces.length; i++) {
+        let index = Math.floor(randomFloat() * pieces.length);
+        let temp = JSON.stringify(pieces[i]);
+        pieces[i] = pieces[index];
+        pieces[index] = JSON.parse(temp);
+    }
+    
+    return pieces;
+}
 
-    console.log(pieces);
+const checkPuzzle = (seed, moves) => {
+    const width = 32;
+    const height = 20;
+    const pieces = simulatePuzzle(seed);
+    
+    for (let i = 0; i < moves.length; i++) {
+        let temp = JSON.stringify(pieces[moves[i].from]);
+        pieces[moves[i].from] = pieces[moves[i].to];
+        pieces[moves[i].to] = JSON.parse(temp);
+    }
+
+    let sorted = true;
+    for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+            let index = y * width + x;
+            if (!(pieces[index].x == x && pieces[index].y == y)) {
+                sorted = false;
+            }
+        }
+    }
+
+    return sorted;
 }
 
 export default router;

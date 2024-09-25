@@ -2,6 +2,9 @@ import mazeGen from '@sbj42/maze-generator';
 import fs from 'fs';
 import { PNG } from 'pngjs';
 
+// _14765}
+// you did it!
+
 const size = 10;
 const pixelSize = 10;
 let mazeJson = [];
