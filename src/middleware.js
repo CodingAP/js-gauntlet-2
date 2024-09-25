@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import userManager from './user_manager.js';
 
-const DEBUG = true;
+const DEBUG = false;
 
 const authenticate = (request, response, next) => {
     if (!request.cookies.session) request.auth = null;

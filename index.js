@@ -5,7 +5,7 @@ import apiRouter from './src/api.js';
 import stageRouter from './src/stage.js';
 
 // ten_them
-// ZGV2L21hemVfZ2VuLmpz
+// cHVibGljL2ltZy9jb25ncmF0cy5wbmc=
 
 const __dirname = path.resolve();
 

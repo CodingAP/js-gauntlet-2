@@ -70,4 +70,4 @@ Flag: `flag{i_actually_wasnt_sorry_83911}`
 ~ Justin from IT
 
 Flag: `flag{we_have_beaten_them_14765}`
-Russian Comment: It seems like the master key is just placed in the root directory of the server application called 'flag'. What a stupid idea!
+Russian Comment: It seems like the master key is just placed in the root directory of the server application called 'flag'. What a stupid idea! I'll just, you know, spread this around to where you can't find it so easily...
