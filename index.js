@@ -1,6 +1,7 @@
 import path from 'node:path';
 import express from 'express';
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
 import apiRouter from './src/api.js';
 import stageRouter from './src/stage.js';
 
@@ -10,13 +11,14 @@ import stageRouter from './src/stage.js';
 const __dirname = path.resolve();
 
 const app = express();
-const PORT = 1338;
+const PORT = 80;
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '/views'));
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors());
 
 app.use('/api', apiRouter);
 app.use('/stage', stageRouter);
