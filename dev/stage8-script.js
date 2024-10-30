@@ -14,7 +14,6 @@ fetch('http://localhost:1338/api/stage8/show_notification', {
 .then(response => response.json())
 .then(data => {
     fs.writeFileSync('test.png', Buffer.from(data.data.data));
-    // console.log(data.data.data.map(byte => String.fromCharCode(byte)).join(''))
 })
 
 // flag{we_have_beaten_them_14765}
